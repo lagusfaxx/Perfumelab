@@ -2,66 +2,67 @@
 
 import { motion } from 'framer-motion';
 import { FAMILIAS } from '@/lib/families';
-import type { RitualOption } from '@/types';
+import type { FamiliaKey, RitualOption } from '@/types';
 import { cn } from '@/lib/utils';
+
+const CLAY = '#c0875c';
 
 export function OptionCard({
   option,
   index,
   selected,
   onSelect,
+  onPreview,
   disabled,
 }: {
   option: RitualOption;
   index: number;
   selected: boolean;
   onSelect: () => void;
+  onPreview?: (familia: FamiliaKey | null) => void;
   disabled?: boolean;
 }) {
-  const accent = option.familiaAcento ? FAMILIAS[option.familiaAcento].color : '#c9a44c';
+  const accent = option.familiaAcento ? FAMILIAS[option.familiaAcento].color : CLAY;
 
   return (
     <motion.button
       type="button"
       onClick={onSelect}
+      onMouseEnter={() => onPreview?.(option.familiaAcento ?? null)}
+      onMouseLeave={() => onPreview?.(null)}
+      onFocus={() => onPreview?.(option.familiaAcento ?? null)}
       disabled={disabled}
-      initial={{ opacity: 0, y: 16 }}
+      initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.05 * index, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-      whileHover={{ scale: disabled ? 1 : 1.015 }}
-      whileTap={{ scale: 0.985 }}
+      whileTap={{ scale: 0.99 }}
       aria-pressed={selected}
       className={cn(
-        'group relative w-full overflow-hidden rounded-2xl border px-5 py-4 text-left transition-colors duration-300',
-        'glass',
-        selected
-          ? 'border-transparent'
-          : 'border-ink/10 hover:border-ink/25'
+        'group relative w-full overflow-hidden rounded-xl border px-5 py-4 text-left transition-colors duration-300',
+        selected ? 'bg-canvas-soft/70' : 'border-ink/10 bg-canvas-soft/30 hover:border-ink/25'
       )}
-      style={
-        selected
-          ? { boxShadow: `0 0 0 1px ${accent}, 0 0 40px -8px ${accent}` }
-          : undefined
-      }
+      style={selected ? { borderColor: accent } : undefined}
     >
-      {/* lavado de color al seleccionar */}
+      {/* lavado de color muy sutil al elegir/hover */}
       <span
         aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+        className="pointer-events-none absolute inset-y-0 left-0 w-1 transition-all duration-500"
         style={{
-          opacity: selected ? 0.16 : undefined,
-          background: `radial-gradient(circle at 12% 50%, ${accent}, transparent 60%)`,
+          background: accent,
+          opacity: selected ? 0.9 : 0.0,
         }}
       />
-      <span className="relative flex items-center gap-3">
+      <span className="relative flex items-start gap-3">
         <span
-          className="mt-0.5 h-2.5 w-2.5 flex-shrink-0 rounded-full transition-transform duration-300"
-          style={{ background: accent, transform: selected ? 'scale(1.5)' : 'scale(1)' }}
+          className="mt-1.5 h-2 w-2 flex-shrink-0 rounded-full transition-transform duration-300"
+          style={{ background: accent, transform: selected ? 'scale(1.6)' : 'scale(1)' }}
         />
-        <span>
-          <span className="block font-serif text-lg text-ink">{option.label}</span>
-          {option.hint && (
-            <span className="mt-0.5 block text-sm text-ink-muted">{option.hint}</span>
+        <span className="min-w-0">
+          <span className="block font-serif text-lg leading-snug text-ink">{option.label}</span>
+          {(option.aroma || option.hint) && (
+            <span className="mt-1 block text-sm leading-snug text-ink-muted">
+              {option.aroma ?? option.hint}
+            </span>
           )}
         </span>
       </span>

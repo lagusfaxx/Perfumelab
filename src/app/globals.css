@@ -6,8 +6,8 @@
   /* --font-serif / --font-sans los inyecta next/font en <html> (auto-alojadas) */
 
   /* Aura activa — la sobreescribe cada familia/paso del ritual */
-  --aura-from: rgba(201, 164, 76, 0.18);
-  --aura-accent: #c9a44c;
+  --aura-from: rgba(176, 122, 79, 0.15);
+  --aura-accent: #c0875c;
 }
 
 * {
@@ -21,28 +21,24 @@ html {
 
 body {
   margin: 0;
-  background: #0c0a0d;
-  color: #efe7e1;
+  background: #15120d;
+  color: #ece4d6;
   font-family: var(--font-sans);
   font-size: 16px;
-  line-height: 1.65;
+  line-height: 1.7;
   font-weight: 400;
-  letter-spacing: 0.005em;
   min-height: 100dvh;
   overflow-x: hidden;
 }
 
+/* Marcellus: romana de un solo peso; jerarquía por tamaño y aire, no por bold */
 h1, h2, h3, .serif {
   font-family: var(--font-serif);
-  font-weight: 500;
-  font-optical-sizing: auto;
-  letter-spacing: -0.015em;
-  line-height: 1.08;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  line-height: 1.16;
 }
-
-/* Fraunces respira mejor un pelín más bold en oscuro */
-h1 { font-weight: 540; }
-.serif-soft { font-weight: 460; letter-spacing: -0.01em; }
+.serif-soft { font-weight: 400; }
 
 /* Aura que respira detrás del contenido sensorial */
 .aura-stage {
@@ -59,19 +55,17 @@ h1 { font-weight: 540; }
   animation: breathe 7s ease-in-out infinite;
 }
 
-/* Texto con leve gradiente de latón */
+/* Acento de marca: arcilla sólida, sin gradiente brillante */
 .text-brass-gradient {
-  background: linear-gradient(120deg, #e3c878, #c9a44c 40%, #8a6f2e);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: #c8916a;
 }
 
+/* Tarjeta natural: vidrio muy sutil, casi mate */
 .glass {
-  background: rgba(29, 25, 34, 0.55);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1px solid rgba(244, 238, 233, 0.08);
+  background: rgba(30, 26, 20, 0.5);
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+  border: 1px solid rgba(236, 228, 214, 0.07);
 }
 
 /* Scrollbar discreto */

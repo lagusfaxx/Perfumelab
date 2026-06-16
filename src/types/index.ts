@@ -58,6 +58,11 @@ export interface RitualOption {
   label: string;
   /** Texto poético corto que aparece al pasar/elegir. */
   hint?: string;
+  /**
+   * A qué huele esta elección: frase sensorial concreta que se "respira"
+   * al pasar o elegir la opción (ej. "Tierra mojada, musgo y madera").
+   */
+  aroma?: string;
   /** Aporte parcial al vector de preferencias (se acumula). */
   weights: Partial<PreferenceVector>;
   /** Familia que esta opción "enciende" visualmente al elegirse. */

@@ -17,8 +17,8 @@ export default function OpengraphImage() {
           alignItems: 'center',
           justifyContent: 'center',
           background:
-            'radial-gradient(ellipse at 50% 35%, #3c2160 0%, #0c0a0d 65%)',
-          color: '#f4eee9',
+            'radial-gradient(ellipse at 50% 35%, #28221a 0%, #15120d 70%)',
+          color: '#ece4d6',
           fontFamily: 'serif',
         }}
       >
@@ -27,17 +27,17 @@ export default function OpengraphImage() {
             fontSize: 26,
             letterSpacing: 14,
             textTransform: 'uppercase',
-            color: '#c9a44c',
+            color: '#c0875c',
           }}
         >
           Perfume Lab Chile
         </div>
-        <div style={{ display: 'flex', fontSize: 76, marginTop: 28, textAlign: 'center' }}>
-          No elijas un perfume.
+        <div style={{ display: 'flex', fontSize: 74, marginTop: 28, textAlign: 'center' }}>
+          No busques un perfume.
         </div>
-        <div style={{ display: 'flex', fontSize: 76, color: '#e3c878' }}>Diséñalo.</div>
-        <div style={{ fontSize: 30, marginTop: 30, color: '#cabfc0' }}>
-          Un ritual que traduce quién eres en una fragancia única
+        <div style={{ display: 'flex', fontSize: 74, color: '#d6a87d' }}>Encuentra el tuyo.</div>
+        <div style={{ fontSize: 29, marginTop: 30, color: '#c2b6a4' }}>
+          Un ritual que traduce quién eres en una fragancia
         </div>
       </div>
     ),

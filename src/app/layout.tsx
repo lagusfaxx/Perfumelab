@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
-import { fraunces, inter } from './fonts';
+import { displayFont, bodyFont } from './fonts';
 import { SoundProvider } from '@/components/sensory/SoundProvider';
 
 const APP_URL = process.env.APP_URL ?? 'https://perfumelabchile.cl';
@@ -52,7 +52,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="es" className={`${fraunces.variable} ${inter.variable}`}>
+    <html lang="es" className={`${displayFont.variable} ${bodyFont.variable}`}>
       <body>
         <SoundProvider>{children}</SoundProvider>
       </body>

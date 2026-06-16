@@ -14,22 +14,22 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Lienzo base — íntimo, casi negro cálido
+        // Lienzo base — tierra cálida, casi negro con fondo orgánico
         canvas: {
-          DEFAULT: '#0c0a0d',
-          soft: '#15121a',
-          raised: '#1d1922',
+          DEFAULT: '#15120d',
+          soft: '#1e1a14',
+          raised: '#28221a',
         },
         ink: {
-          DEFAULT: '#f4eee9',
-          soft: '#cabfc0',
-          muted: '#8a7f88',
+          DEFAULT: '#ece4d6',
+          soft: '#c2b6a4',
+          muted: '#8b8073',
         },
-        // Acento de marca (dorado apagado / latón de frasco)
+        // Acento de marca: arcilla / tierra (natural, no dorado brillante)
         brass: {
-          DEFAULT: '#c9a44c',
-          soft: '#e3c878',
-          deep: '#8a6f2e',
+          DEFAULT: '#c0875c',
+          soft: '#d6a87d',
+          deep: '#8a5f3a',
         },
         // Paletas por familia olfativa (sinestesia)
         citrus: { DEFAULT: '#e9d23b', soft: '#f6ef9a', deep: '#9bbf2e' },
