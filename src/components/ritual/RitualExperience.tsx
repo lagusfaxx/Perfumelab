@@ -6,9 +6,10 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { RITUAL_STEPS, RITUAL_TOTAL_STEPS } from '@/lib/ritual-config';
 import { acumular, normalizar } from '@/lib/mapping';
 import { FAMILIAS } from '@/lib/families';
-import type { FamiliaKey } from '@/types';
+import type { FamiliaKey, RitualOption } from '@/types';
 import { Aura } from '@/components/sensory/Aura';
 import { ParticleField } from '@/components/sensory/ParticleField';
+import { EscenaFondo } from '@/components/sensory/EscenaFondo';
 import { SoundToggle } from '@/components/sensory/SoundToggle';
 import { useSound } from '@/components/sensory/SoundProvider';
 import { OptionCard } from './OptionCard';
@@ -18,6 +19,10 @@ const EASE = [0.16, 1, 0.3, 1] as const;
 const BLOOM_MS = 1800;
 const REFLEJO_MS = 2000;
 
+/** Ruta de la foto ambiental de una opción (puede no existir → fallback a familia). */
+const rutaEscena = (stepId: string, optionId: string) =>
+  `/ambientes/${stepId}/${optionId}.jpg`;
+
 export function RitualExperience() {
   const router = useRouter();
   const { setScene, enabled } = useSound();
@@ -25,14 +30,22 @@ export function RitualExperience() {
   const [stepIdx, setStepIdx] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [activeFamilia, setActiveFamilia] = useState<FamiliaKey>('VERDES');
-  const [previewFamilia, setPreviewFamilia] = useState<FamiliaKey | null>(null);
-  const [bloom, setBloom] = useState<{ familia: FamiliaKey; aroma: string; label: string } | null>(null);
+  const [previewOption, setPreviewOption] = useState<RitualOption | null>(null);
+  const [bloom, setBloom] = useState<{ familia: FamiliaKey; aroma: string; label: string; imagen: string } | null>(null);
   const [reflejo, setReflejo] = useState<string | null>(null);
   const [phase, setPhase] = useState<Phase>('q');
 
   const step = RITUAL_STEPS[stepIdx];
-  // La familia que tiñe la escena: preview al pasar > bloom > activa.
-  const escena = previewFamilia ?? activeFamilia;
+
+  // Familia y foto que tiñen la escena (preview al pasar > bloom/activa).
+  const escenaFamilia = previewOption?.familiaAcento ?? activeFamilia;
+  const escenaSrc =
+    phase === 'bloom'
+      ? bloom?.imagen
+      : previewOption
+        ? rutaEscena(step.id, previewOption.id)
+        : undefined;
+  const escenaFallback = FAMILIAS[escenaFamilia].imagen;
 
   // El soundscape sólo cambia al confirmar (no en hover, para no entrecortar el audio).
   useEffect(() => {
@@ -68,7 +81,7 @@ export function RitualExperience() {
 
     const next = { ...answers, [step.id]: optionId };
     setAnswers(next);
-    setPreviewFamilia(null);
+    setPreviewOption(null);
     const familia = opt.familiaAcento ?? activeFamilia;
     setActiveFamilia(familia);
 
@@ -76,13 +89,17 @@ export function RitualExperience() {
     const texto = step.reflejo?.(acc) ?? null;
     const isLast = stepIdx === RITUAL_TOTAL_STEPS - 1;
 
-    // 1) Florece el aroma elegido.
-    setBloom({ familia, aroma: opt.aroma ?? opt.hint ?? opt.label, label: opt.label });
+    // 1) Florece el aroma elegido (con su foto ambiental).
+    setBloom({
+      familia,
+      aroma: opt.aroma ?? opt.hint ?? opt.label,
+      label: opt.label,
+      imagen: rutaEscena(step.id, opt.id),
+    });
     setPhase('bloom');
 
     window.setTimeout(() => {
       setBloom(null);
-      // 2) Reflejo (si hay), luego avanza.
       if (texto) {
         setReflejo(texto);
         setPhase('reflejo');
@@ -102,16 +119,25 @@ export function RitualExperience() {
   };
 
   const progress = ((stepIdx + (phase === 'q' ? 0 : 1)) / RITUAL_TOTAL_STEPS) * 100;
-  const auraIntensity = phase === 'bloom' ? 0.5 : 0.28;
+  const auraIntensity = phase === 'bloom' ? 0.3 : 0.14;
 
   return (
     <Aura
-      familia={escena}
+      familia={escenaFamilia}
       intensity={auraIntensity}
       className="relative flex min-h-[100dvh] flex-col overflow-hidden"
     >
-      <div className="pointer-events-none absolute inset-0 -z-10 opacity-70">
-        <ParticleField familia={escena} intensity={phase === 'bloom' ? 1.25 : 0.85} />
+      {/* Fondo: foto de la escena/ingrediente con scrim */}
+      <div className="pointer-events-none absolute inset-0 -z-20">
+        <EscenaFondo
+          src={escenaSrc}
+          fallbackSrc={escenaFallback}
+          familia={escenaFamilia}
+          prominencia={phase === 'bloom' ? 'alta' : 'sutil'}
+        />
+      </div>
+      <div className="pointer-events-none absolute inset-0 -z-10 opacity-60">
+        <ParticleField familia={escenaFamilia} intensity={phase === 'bloom' ? 1.25 : 0.8} />
       </div>
 
       {/* Header: progreso + sonido */}
@@ -133,7 +159,7 @@ export function RitualExperience() {
         <SoundToggle />
       </header>
 
-      <div className="relative z-10 mx-5 mt-4 h-px bg-ink/10 sm:mx-8">
+      <div className="relative z-10 mx-5 mt-4 h-px bg-ink/15 sm:mx-8">
         <motion.div
           className="absolute inset-y-0 left-0 bg-brass"
           animate={{ width: `${progress}%` }}
@@ -160,7 +186,7 @@ export function RitualExperience() {
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1, duration: 0.7 }}
-                className="text-xs uppercase tracking-[0.3em] text-ink-muted"
+                className="text-xs uppercase tracking-[0.3em] text-ink-soft"
               >
                 {bloom.label}
               </motion.p>
@@ -168,16 +194,16 @@ export function RitualExperience() {
                 initial={{ opacity: 0, y: 14, filter: 'blur(8px)' }}
                 animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
                 transition={{ delay: 0.25, duration: 1.1, ease: EASE }}
-                className="mt-5 max-w-xl font-serif text-3xl leading-snug sm:text-4xl"
-                style={{ color: FAMILIAS[bloom.familia].colorSoft }}
+                className="mt-5 max-w-xl font-serif text-3xl leading-snug text-ink sm:text-4xl"
+                style={{ textShadow: '0 2px 24px rgba(0,0,0,0.6)' }}
               >
                 {bloom.aroma}
               </motion.p>
               <motion.span
                 initial={{ opacity: 0 }}
-                animate={{ opacity: 0.55 }}
+                animate={{ opacity: 0.6 }}
                 transition={{ delay: 1, duration: 0.8 }}
-                className="mt-7 text-xs italic text-ink-muted"
+                className="mt-7 text-xs italic text-ink-soft"
               >
                 respira…
               </motion.span>
@@ -202,11 +228,14 @@ export function RitualExperience() {
               transition={{ duration: 0.6, ease: EASE }}
               className="w-full max-w-xl"
             >
-              <h1 className="text-balance text-center text-3xl leading-tight text-ink sm:text-4xl">
+              <h1
+                className="text-balance text-center text-3xl leading-tight text-ink sm:text-4xl"
+                style={{ textShadow: '0 2px 20px rgba(0,0,0,0.5)' }}
+              >
                 {step.pregunta}
               </h1>
               {step.subtitulo && (
-                <p className="mt-3 text-center text-sm italic text-ink-muted">{step.subtitulo}</p>
+                <p className="mt-3 text-center text-sm italic text-ink-soft">{step.subtitulo}</p>
               )}
               <div className="mt-9 flex flex-col gap-3">
                 {step.options.map((opt, i) => (
@@ -216,7 +245,7 @@ export function RitualExperience() {
                     index={i}
                     selected={answers[step.id] === opt.id}
                     onSelect={() => select(opt.id)}
-                    onPreview={setPreviewFamilia}
+                    onPreview={setPreviewOption}
                   />
                 ))}
               </div>
@@ -242,7 +271,7 @@ function Mezclando() {
         transition={{ rotate: { duration: 3, repeat: Infinity, ease: 'linear' }, scale: { duration: 2, repeat: Infinity } }}
       />
       <p className="font-serif text-2xl text-ink">Mezclando tu fragancia…</p>
-      <p className="text-sm text-ink-muted">Traduciendo tus respuestas en aroma.</p>
+      <p className="text-sm text-ink-soft">Traduciendo tus respuestas en aroma.</p>
     </motion.div>
   );
 }
@@ -255,7 +284,7 @@ function ErrorBlock({ onRetry }: { onRetry: () => void }) {
       className="flex flex-col items-center gap-5 text-center"
     >
       <p className="font-serif text-2xl text-ink">Algo se interpuso en el aire.</p>
-      <p className="max-w-sm text-sm text-ink-muted">
+      <p className="max-w-sm text-sm text-ink-soft">
         No pudimos revelar tu fragancia. Respira e inténtalo otra vez.
       </p>
       <button

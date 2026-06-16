@@ -7,6 +7,7 @@ import type { FamiliaKey, FamiliaSensorial } from '@/types';
 export const FAMILIAS: Record<FamiliaKey, FamiliaSensorial> = {
   CITRICOS: {
     key: 'CITRICOS',
+    imagen: '/ambientes/familia/citricos.jpg',
     nombre: 'Cítricos',
     color: '#cbb45a',
     colorSoft: '#e3d6a0',
@@ -17,6 +18,7 @@ export const FAMILIAS: Record<FamiliaKey, FamiliaSensorial> = {
   },
   FLORALES: {
     key: 'FLORALES',
+    imagen: '/ambientes/familia/florales.jpg',
     nombre: 'Florales',
     color: '#c98da6',
     colorSoft: '#e6c8d3',
@@ -27,6 +29,7 @@ export const FAMILIAS: Record<FamiliaKey, FamiliaSensorial> = {
   },
   AMADERADOS: {
     key: 'AMADERADOS',
+    imagen: '/ambientes/familia/amaderados.jpg',
     nombre: 'Amaderados',
     color: '#9c6f44',
     colorSoft: '#c39a72',
@@ -37,6 +40,7 @@ export const FAMILIAS: Record<FamiliaKey, FamiliaSensorial> = {
   },
   ORIENTALES: {
     key: 'ORIENTALES',
+    imagen: '/ambientes/familia/orientales.jpg',
     nombre: 'Orientales',
     color: '#8a6a86',
     colorSoft: '#b89bad',
@@ -47,6 +51,7 @@ export const FAMILIAS: Record<FamiliaKey, FamiliaSensorial> = {
   },
   ACUATICOS: {
     key: 'ACUATICOS',
+    imagen: '/ambientes/familia/acuaticos.jpg',
     nombre: 'Frescos / Acuáticos',
     color: '#5d93a0',
     colorSoft: '#aac6cc',
@@ -57,6 +62,7 @@ export const FAMILIAS: Record<FamiliaKey, FamiliaSensorial> = {
   },
   VERDES: {
     key: 'VERDES',
+    imagen: '/ambientes/familia/verdes.jpg',
     nombre: 'Verdes',
     color: '#7d9466',
     colorSoft: '#b9cca6',

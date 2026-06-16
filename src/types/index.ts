@@ -96,6 +96,8 @@ export interface FamiliaSensorial {
   color: string;
   colorSoft: string;
   colorDeep: string;
+  /** Foto ambiental de respaldo de la familia (en /public). */
+  imagen?: string;
   /** Descripción del mood. */
   mood: string;
   /** Parámetros de movimiento para Framer Motion / partículas. */

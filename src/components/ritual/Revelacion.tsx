@@ -10,6 +10,7 @@ import { formatCLP } from '@/lib/utils';
 import type { FamiliaKey, PreferenceVector } from '@/types';
 import { Aura } from '@/components/sensory/Aura';
 import { ParticleField } from '@/components/sensory/ParticleField';
+import { EscenaFondo } from '@/components/sensory/EscenaFondo';
 import { SoundToggle } from '@/components/sensory/SoundToggle';
 import { Bottle } from '@/components/sensory/Bottle';
 import { useSound } from '@/components/sensory/SoundProvider';
@@ -91,10 +92,13 @@ export function Revelacion({
   return (
     <Aura
       familia={familia}
-      intensity={0.32}
+      intensity={0.18}
       className="relative flex min-h-[100dvh] flex-col items-center overflow-hidden px-5 py-10 sm:px-8"
     >
-      <div className="pointer-events-none absolute inset-0 -z-10 opacity-80">
+      <div className="pointer-events-none absolute inset-0 -z-20">
+        <EscenaFondo familia={familia} fallbackSrc={f.imagen} prominencia="sutil" />
+      </div>
+      <div className="pointer-events-none absolute inset-0 -z-10 opacity-50">
         <ParticleField familia={familia} intensity={1} />
       </div>
 

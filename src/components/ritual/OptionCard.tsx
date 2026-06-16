@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { FAMILIAS } from '@/lib/families';
-import type { FamiliaKey, RitualOption } from '@/types';
+import type { RitualOption } from '@/types';
 import { cn } from '@/lib/utils';
 
 const CLAY = '#c0875c';
@@ -19,7 +19,7 @@ export function OptionCard({
   index: number;
   selected: boolean;
   onSelect: () => void;
-  onPreview?: (familia: FamiliaKey | null) => void;
+  onPreview?: (option: RitualOption | null) => void;
   disabled?: boolean;
 }) {
   const accent = option.familiaAcento ? FAMILIAS[option.familiaAcento].color : CLAY;
@@ -28,9 +28,9 @@ export function OptionCard({
     <motion.button
       type="button"
       onClick={onSelect}
-      onMouseEnter={() => onPreview?.(option.familiaAcento ?? null)}
+      onMouseEnter={() => onPreview?.(option)}
       onMouseLeave={() => onPreview?.(null)}
-      onFocus={() => onPreview?.(option.familiaAcento ?? null)}
+      onFocus={() => onPreview?.(option)}
       disabled={disabled}
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
