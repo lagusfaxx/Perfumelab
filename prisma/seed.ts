@@ -1,4 +1,4 @@
-import { PrismaClient, type Intensidad } from '@prisma/client';
+import { PrismaClient, Prisma, type Intensidad } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import type { FamiliaKey, PreferenceVector } from '../src/types';
 import { emptyVector, INTENSIDAD_VALUE } from '../src/lib/mapping';
@@ -12,6 +12,9 @@ const vec = (p: Partial<PreferenceVector>): PreferenceVector => ({
   ...p,
 });
 const clamp01 = (n: number) => Math.max(0, Math.min(1, n));
+// Los vectores tipados necesitan castearse al tipo JSON de Prisma.
+const J = (v: PreferenceVector | Partial<PreferenceVector>) =>
+  v as unknown as Prisma.InputJsonObject;
 
 // ── Bases (10 fórmulas madre) ─────────────────────────────────
 interface BaseDef {
@@ -235,12 +238,12 @@ async function main() {
       update: {
         nombre: b.nombre, familiaOlfativa: b.familia, descripcion: b.descripcion,
         notasCabeza: b.cabeza, notasCorazon: b.corazon, notasFondo: b.fondo,
-        perfilJson: b.perfil, activo: true,
+        perfilJson: J(b.perfil), activo: true,
       },
       create: {
         id: baseId, nombre: b.nombre, familiaOlfativa: b.familia, descripcion: b.descripcion,
         notasCabeza: b.cabeza, notasCorazon: b.corazon, notasFondo: b.fondo,
-        perfilJson: b.perfil,
+        perfilJson: J(b.perfil),
       },
     });
 
@@ -279,8 +282,8 @@ async function main() {
 
       await prisma.combinacion.upsert({
         where: { id: combId },
-        update: { sku, baseId, modificadorId: modId, modPorcentaje, intensidad: v.intensidad, precioBase, fichaJson: ficha, vectorJson: vector, activo: true },
-        create: { id: combId, sku, baseId, modificadorId: modId, modPorcentaje, intensidad: v.intensidad, precioBase, fichaJson: ficha, vectorJson: vector },
+        update: { sku, baseId, modificadorId: modId, modPorcentaje, intensidad: v.intensidad, precioBase, fichaJson: ficha, vectorJson: J(vector), activo: true },
+        create: { id: combId, sku, baseId, modificadorId: modId, modPorcentaje, intensidad: v.intensidad, precioBase, fichaJson: ficha, vectorJson: J(vector) },
       });
       nCombos++;
 

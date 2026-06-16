@@ -1,0 +1,106 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-serif: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+
+  /* Aura activa — la sobreescribe cada familia/paso del ritual */
+  --aura-from: rgba(201, 164, 76, 0.18);
+  --aura-accent: #c9a44c;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  margin: 0;
+  background: #0c0a0d;
+  color: #f4eee9;
+  font-family: var(--font-sans);
+  min-height: 100dvh;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, .serif {
+  font-family: var(--font-serif);
+  font-weight: 500;
+}
+
+/* Aura que respira detrás del contenido sensorial */
+.aura-stage {
+  position: relative;
+  isolation: isolate;
+}
+.aura-stage::before {
+  content: '';
+  position: absolute;
+  inset: -20%;
+  z-index: -1;
+  background: radial-gradient(ellipse at 50% 40%, var(--aura-from) 0%, transparent 65%);
+  transition: background 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: breathe 7s ease-in-out infinite;
+}
+
+/* Texto con leve gradiente de latón */
+.text-brass-gradient {
+  background: linear-gradient(120deg, #e3c878, #c9a44c 40%, #8a6f2e);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.glass {
+  background: rgba(29, 25, 34, 0.55);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(244, 238, 233, 0.08);
+}
+
+/* Scrollbar discreto */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: #0c0a0d; }
+::-webkit-scrollbar-thumb { background: #2a2430; border-radius: 6px; }
+::-webkit-scrollbar-thumb:hover { background: #3a3340; }
+
+::selection {
+  background: rgba(201, 164, 76, 0.3);
+  color: #f4eee9;
+}
+
+/* Foco accesible */
+:focus-visible {
+  outline: 2px solid var(--aura-accent);
+  outline-offset: 2px;
+}
+
+/* Respeta prefers-reduced-motion: corta animaciones y movimiento */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .aura-stage::before { animation: none; }
+}
+
+/* Utilidad: ocultar visualmente, accesible para lectores */
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

@@ -63,6 +63,9 @@ importers:
       autoprefixer:
         specifier: 10.4.20
         version: 10.4.20(postcss@8.4.49)
+      esbuild:
+        specifier: 0.23.1
+        version: 0.23.1
       eslint:
         specifier: 8.57.1
         version: 8.57.1

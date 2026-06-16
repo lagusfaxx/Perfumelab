@@ -1,0 +1,62 @@
+# Perfume Lab Chile — web (Next.js standalone) + Postgres.
+# Pensado para Coolify (que inyecta el routing Traefik/Cloudflare) y para correr local.
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-perfumelab}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-perfumelab}
+      POSTGRES_DB: ${POSTGRES_DB:-perfumelab}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-perfumelab} -d ${POSTGRES_DB:-perfumelab}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    # Sólo red interna en producción. Para inspección local descomenta:
+    # ports:
+    #   - '5432:5432'
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql://perfumelab:perfumelab@db:5432/perfumelab?schema=public}
+      APP_URL: ${APP_URL:-http://localhost:3000}
+      FLOW_API_KEY: ${FLOW_API_KEY}
+      FLOW_SECRET_KEY: ${FLOW_SECRET_KEY}
+      FLOW_API_URL: ${FLOW_API_URL:-https://sandbox.flow.cl/api}
+      ADMIN_SESSION_SECRET: ${ADMIN_SESSION_SECRET}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@perfumelabchile.cl}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      EMAIL_FROM: ${EMAIL_FROM:-Perfume Lab <pedidos@perfumelabchile.cl>}
+      NODE_ENV: production
+    ports:
+      - '${WEB_PORT:-3000}:3000'
+    healthcheck:
+      test: ['CMD', 'wget', '-qO-', 'http://127.0.0.1:3000/api/health']
+      interval: 30s
+      timeout: 5s
+      start_period: 45s
+      retries: 3
+    # En Coolify el dominio/SSL se configura en el panel. Si usas Traefik directo,
+    # ejemplo de labels (ajusta el Host):
+    # labels:
+    #   - traefik.enable=true
+    #   - traefik.http.routers.perfumelab.rule=Host(`perfumelabchile.cl`)
+    #   - traefik.http.routers.perfumelab.entrypoints=websecure
+    #   - traefik.http.routers.perfumelab.tls.certresolver=letsencrypt
+    #   - traefik.http.services.perfumelab.loadbalancer.server.port=3000
+
+volumes:
+  pgdata:

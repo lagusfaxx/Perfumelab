@@ -1,0 +1,15 @@
+import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
+
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
+/** Healthcheck para Docker/Coolify: verifica proceso + conexión a la DB. */
+export async function GET() {
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    return NextResponse.json({ status: 'ok', db: 'up', ts: new Date().toISOString() });
+  } catch {
+    return NextResponse.json({ status: 'degraded', db: 'down' }, { status: 503 });
+  }
+}
