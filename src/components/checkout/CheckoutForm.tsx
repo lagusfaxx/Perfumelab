@@ -5,6 +5,8 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { Button } from '@/components/ui/Button';
 import { Input, Label, Select, Textarea } from '@/components/ui/Field';
 import { formatCLP, formatRut, validarRut } from '@/lib/utils';
+import { FraganciaCard } from '@/components/fragancia/FraganciaCard';
+import { PiramideNotas } from '@/components/fragancia/PiramideNotas';
 import { REGIONES_CHILE } from './regiones';
 import type { FormatoView, FraganciaView, PackagingView } from './types';
 
@@ -66,6 +68,15 @@ export function CheckoutForm({ fragancia, formatos, packaging }: Props) {
     () => packaging.filter((p) => packagingIds.includes(p.id)),
     [packaging, packagingIds]
   );
+
+  // Concentración derivada del formato elegido → alimenta los medidores.
+  const conc = useMemo(() => {
+    const n = (formatoSel?.nombre ?? '').toLowerCase();
+    if (n.includes('toilette')) return { label: 'Eau de Toilette', intensidad: 0.4, estela: 0.42 };
+    if (n.includes('extrait')) return { label: 'Extrait de Parfum', intensidad: 0.9, estela: 0.95 };
+    if (n.includes('parfum')) return { label: 'Eau de Parfum', intensidad: 0.72, estela: 0.72 };
+    return { label: formatoSel?.nombre?.split('·')[0]?.trim() ?? 'Eau de Parfum', intensidad: 0.6, estela: 0.6 };
+  }, [formatoSel]);
 
   const montoProducto = formatoSel?.precio ?? 0;
   const montoPackaging = packagingSel.reduce((acc, p) => acc + p.precioExtra, 0);
@@ -153,19 +164,28 @@ export function CheckoutForm({ fragancia, formatos, packaging }: Props) {
       {/* ── Columna principal: diseño + selección + datos ── */}
       <div className="space-y-8">
         {/* Fragancia diseñada */}
-        <section className="glass rounded-2xl p-6 sm:p-7">
-          <p className="text-[11px] uppercase tracking-[0.3em] text-ink-muted">
-            Tu fragancia
-          </p>
-          <h2 className="mt-2 text-3xl text-ink">{fragancia.nombreFragancia}</h2>
-          <p className="mt-1 text-sm text-brass">
-            {fragancia.familiaNombre} · {fragancia.baseNombre}
-          </p>
-
-          <div className="mt-5 grid gap-3 sm:grid-cols-3">
-            <NotaBloque titulo="Cabeza" notas={fragancia.notasCabeza} />
-            <NotaBloque titulo="Corazón" notas={fragancia.notasCorazon} />
-            <NotaBloque titulo="Fondo" notas={fragancia.notasFondo} />
+        <section className="glass rounded-2xl p-5 sm:p-6">
+          <p className="text-[11px] uppercase tracking-[0.3em] text-ink-muted">Tu fragancia</p>
+          <div className="mt-3">
+            <FraganciaCard
+              nombre={fragancia.nombreFragancia}
+              familia={fragancia.familia}
+              intensidadLabel={conc.label}
+              notasTop={fragancia.notasCabeza}
+              className="border-none bg-transparent p-0"
+            />
+          </div>
+          <div className="mt-5">
+            <PiramideNotas
+              familia={fragancia.familia}
+              notas={{
+                cabeza: fragancia.notasCabeza,
+                corazon: fragancia.notasCorazon,
+                fondo: fragancia.notasFondo,
+              }}
+              intensidad={conc.intensidad}
+              estela={conc.estela}
+            />
           </div>
         </section>
 
@@ -460,16 +480,6 @@ export function CheckoutForm({ fragancia, formatos, packaging }: Props) {
         </div>
       </aside>
     </form>
-  );
-}
-
-function NotaBloque({ titulo, notas }: { titulo: string; notas: string[] }) {
-  if (!notas.length) return null;
-  return (
-    <div className="rounded-xl bg-canvas/60 p-3">
-      <p className="text-[10px] uppercase tracking-[0.2em] text-brass">{titulo}</p>
-      <p className="mt-1 text-xs leading-relaxed text-ink-soft">{notas.join(' · ')}</p>
-    </div>
   );
 }
 

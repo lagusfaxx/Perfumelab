@@ -3,8 +3,7 @@
 @tailwind utilities;
 
 :root {
-  --font-serif: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
-  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  /* --font-serif / --font-sans los inyecta next/font en <html> (auto-alojadas) */
 
   /* Aura activa — la sobreescribe cada familia/paso del ritual */
   --aura-from: rgba(201, 164, 76, 0.18);
@@ -23,8 +22,12 @@ html {
 body {
   margin: 0;
   background: #0c0a0d;
-  color: #f4eee9;
+  color: #efe7e1;
   font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.65;
+  font-weight: 400;
+  letter-spacing: 0.005em;
   min-height: 100dvh;
   overflow-x: hidden;
 }
@@ -32,7 +35,14 @@ body {
 h1, h2, h3, .serif {
   font-family: var(--font-serif);
   font-weight: 500;
+  font-optical-sizing: auto;
+  letter-spacing: -0.015em;
+  line-height: 1.08;
 }
+
+/* Fraunces respira mejor un pelín más bold en oscuro */
+h1 { font-weight: 540; }
+.serif-soft { font-weight: 460; letter-spacing: -0.01em; }
 
 /* Aura que respira detrás del contenido sensorial */
 .aura-stage {

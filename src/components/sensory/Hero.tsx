@@ -12,7 +12,12 @@ import { SoundToggle } from './SoundToggle';
 import { useSound } from './SoundProvider';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
-const LINEAS = ['Perfume Lab', 'No elijas un perfume.', 'Diséñalo.'];
+const LINEAS = [
+  'Perfume Lab',
+  'Cierra los ojos.',
+  '¿A qué huele tu mejor recuerdo?',
+  'Vamos a embotellarlo.',
+];
 
 /** Hero cinematográfico de entrada: secuencia breve y saltable + invitación al ritual. */
 export function Hero() {
@@ -34,10 +39,11 @@ export function Hero() {
   useEffect(() => {
     if (!intro) return;
     if (linea >= LINEAS.length) {
-      const t = setTimeout(() => finalizarIntro(), 900);
+      const t = setTimeout(() => finalizarIntro(), 1400);
       return () => clearTimeout(t);
     }
-    const t = setTimeout(() => setLinea((l) => l + 1), linea === 0 ? 1100 : 1300);
+    // Pausa pensada para que se lea con calma (la marca un poco más corta).
+    const t = setTimeout(() => setLinea((l) => l + 1), linea === 0 ? 1900 : 2800);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [intro, linea]);
@@ -63,6 +69,11 @@ export function Hero() {
     setIntro(false);
   };
 
+  const avanzarIntro = () => {
+    if (linea >= LINEAS.length - 1) finalizarIntro();
+    else setLinea((l) => l + 1);
+  };
+
   return (
     <Aura
       familia={familia}
@@ -77,34 +88,56 @@ export function Hero() {
         {intro ? (
           <motion.div
             key="intro"
-            className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-canvas/40"
+            onClick={avanzarIntro}
+            className="absolute inset-0 z-20 flex cursor-pointer flex-col items-center justify-center bg-canvas/50 px-6"
             exit={{ opacity: 0 }}
-            transition={{ duration: 1 }}
+            transition={{ duration: 1.1 }}
           >
             <AnimatePresence mode="wait">
               {linea < LINEAS.length && (
                 <motion.h1
                   key={linea}
-                  initial={{ opacity: 0, y: 14, filter: 'blur(8px)' }}
+                  initial={{ opacity: 0, y: 16, filter: 'blur(10px)' }}
                   animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                  exit={{ opacity: 0, y: -14, filter: 'blur(8px)' }}
-                  transition={{ duration: 0.9, ease: EASE }}
+                  exit={{ opacity: 0, y: -16, filter: 'blur(10px)' }}
+                  transition={{ duration: 1.1, ease: EASE }}
                   className={
                     linea === 0
                       ? 'text-sm uppercase tracking-[0.5em] text-brass'
-                      : 'text-balance font-serif text-4xl text-ink sm:text-6xl'
+                      : 'text-balance font-serif text-[2rem] leading-tight text-ink sm:text-6xl'
                   }
                 >
                   {LINEAS[linea]}
                 </motion.h1>
               )}
             </AnimatePresence>
-            <button
-              onClick={finalizarIntro}
-              className="absolute bottom-10 text-xs tracking-[0.2em] text-ink-muted transition-colors hover:text-ink"
-            >
-              Saltar intro →
-            </button>
+
+            {/* Puntos de progreso */}
+            <div className="absolute bottom-20 flex gap-2">
+              {LINEAS.map((_, i) => (
+                <span
+                  key={i}
+                  className="h-1.5 w-1.5 rounded-full transition-all duration-500"
+                  style={{
+                    background: i <= linea ? '#c9a44c' : 'rgba(244,238,233,0.18)',
+                    width: i === linea ? '1.5rem' : '0.375rem',
+                  }}
+                />
+              ))}
+            </div>
+
+            <div className="absolute bottom-10 flex flex-col items-center gap-1 text-xs text-ink-muted">
+              <span className="tracking-wide">toca para avanzar</span>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  finalizarIntro();
+                }}
+                className="tracking-[0.2em] underline-offset-4 transition-colors hover:text-ink hover:underline"
+              >
+                Saltar intro →
+              </button>
+            </div>
           </motion.div>
         ) : (
           <motion.div
@@ -141,9 +174,9 @@ export function Hero() {
               transition={{ delay: 0.45, duration: 1, ease: EASE }}
               className="mt-4 max-w-3xl text-balance font-serif text-4xl leading-tight text-ink sm:text-6xl"
             >
-              El olfato no se puede mostrar.
+              No busques un perfume.
               <br />
-              <span className="text-brass-gradient">Aquí se siente.</span>
+              <span className="text-brass-gradient">Encuentra el tuyo.</span>
             </motion.h1>
 
             <motion.p
@@ -152,8 +185,8 @@ export function Hero() {
               transition={{ delay: 0.7, duration: 1 }}
               className="mt-6 max-w-xl text-pretty text-base leading-relaxed text-ink-soft"
             >
-              Un ritual de siete preguntas traduce quién eres en una fragancia única —
-              con su nombre, su historia y un objeto hecho sólo para ti.
+              Responde siete preguntas y te devolvemos un aroma con tu nombre,
+              tus notas y tu historia. Hecho a mano, sólo para ti.
             </motion.p>
 
             <motion.div
@@ -166,13 +199,13 @@ export function Hero() {
                 href="/ritual"
                 className="rounded-full bg-brass px-9 py-4 text-base font-medium text-canvas shadow-lg shadow-brass/25 transition-all duration-300 hover:bg-brass-soft hover:shadow-brass/40"
               >
-                Comenzar el ritual
+                Descubrir mi aroma
               </Link>
               <a
-                href="#como-funciona"
+                href="#demo"
                 className="text-sm text-ink-soft underline-offset-4 transition-colors hover:text-ink hover:underline"
               >
-                Cómo funciona
+                Ver cómo se siente ↓
               </a>
             </motion.div>
 

@@ -55,6 +55,11 @@ export default async function RevelacionPage({
       score: number;
     }[]) ?? [];
 
+  // Intensidad (proyección) y estela (duración/sillage) para los medidores.
+  const intensidad = typeof combVec.intensidad === 'number' ? combVec.intensidad : 0.6;
+  const estelaPorTipo: Record<string, number> = { EDT: 0.42, EDP: 0.72, PARFUM: 0.95 };
+  const estela = estelaPorTipo[perfil.combinacion.intensidad] ?? 0.6;
+
   return (
     <Revelacion
       perfilId={perfil.id}
@@ -71,6 +76,8 @@ export default async function RevelacionPage({
       }}
       desde={desde}
       afinidad={afinidad}
+      intensidad={intensidad}
+      estela={estela}
       alternativas={alternativas.map((a) => ({ nombre: a.nombre, score: Math.round(a.score * 100) }))}
     />
   );

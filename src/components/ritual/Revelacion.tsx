@@ -11,7 +11,9 @@ import type { FamiliaKey, PreferenceVector } from '@/types';
 import { Aura } from '@/components/sensory/Aura';
 import { ParticleField } from '@/components/sensory/ParticleField';
 import { SoundToggle } from '@/components/sensory/SoundToggle';
+import { Bottle } from '@/components/sensory/Bottle';
 import { useSound } from '@/components/sensory/SoundProvider';
+import { PiramideNotas } from '@/components/fragancia/PiramideNotas';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -26,6 +28,8 @@ export function Revelacion({
   notas,
   desde,
   afinidad,
+  intensidad,
+  estela,
   alternativas,
 }: {
   perfilId: string;
@@ -38,10 +42,12 @@ export function Revelacion({
   notas: { cabeza: string[]; corazon: string[]; fondo: string[] };
   desde: number;
   afinidad: number;
+  intensidad: number;
+  estela: number;
   alternativas: { nombre: string; score: number }[];
 }) {
   const router = useRouter();
-  const { setScene, enabled } = useSound();
+  const { setScene } = useSound();
   const f = FAMILIAS[familia];
 
   const [nombre, setNombre] = useState(nombreInicial);
@@ -97,18 +103,26 @@ export function Revelacion({
       </div>
 
       <motion.div
-        initial={{ opacity: 0, y: 30 }}
+        initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1, ease: EASE }}
-        className="flex w-full max-w-2xl flex-1 flex-col items-center justify-center text-center"
+        className="flex w-full max-w-xl flex-1 flex-col items-center justify-center text-center"
       >
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.2, duration: 1.3, ease: EASE }}
+        >
+          <Bottle familia={familia} size={120} />
+        </motion.div>
+
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.3, duration: 1 }}
-          className="text-xs uppercase tracking-[0.35em] text-ink-muted"
+          transition={{ delay: 0.5, duration: 1 }}
+          className="mt-6 text-xs uppercase tracking-[0.35em] text-ink-muted"
         >
-          Tu fragancia es
+          Esto eres tú, hecho aroma
         </motion.p>
 
         {/* Nombre — editable */}
@@ -145,15 +159,15 @@ export function Revelacion({
               disabled={saving}
               className="mt-5 rounded-full bg-brass px-6 py-2.5 text-sm font-medium text-canvas transition-colors hover:bg-brass-soft disabled:opacity-50"
             >
-              {saving ? 'Guardando…' : 'Hacerla mía'}
+              {saving ? 'Guardando…' : 'Esta es la mía'}
             </button>
           </div>
         ) : (
           <motion.h1
             initial={{ opacity: 0, scale: 0.96 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.5, duration: 1.1, ease: EASE }}
-            className="text-brass-gradient mt-3 px-2 font-serif text-5xl leading-tight sm:text-6xl"
+            transition={{ delay: 0.65, duration: 1.1, ease: EASE }}
+            className="text-brass-gradient mt-3 px-2 font-serif text-5xl leading-[1.05] sm:text-6xl"
           >
             {nombre}
           </motion.h1>
@@ -164,55 +178,52 @@ export function Revelacion({
             onClick={() => setEditing(true)}
             className="mt-3 text-xs text-ink-muted underline-offset-4 transition-colors hover:text-brass-soft hover:underline"
           >
-            ✎ Renómbrala — hazla tuya
+            ✎ Ponle el nombre que tú sientas
           </button>
         )}
 
         {/* Chips */}
         <div className="mt-6 flex flex-wrap items-center justify-center gap-2 text-xs">
-          <span className="glass rounded-full px-3 py-1.5 text-ink-soft" style={{ color: f.color }}>
+          <span className="glass rounded-full px-3 py-1.5" style={{ color: f.color }}>
             {f.nombre}
           </span>
           <span className="glass rounded-full px-3 py-1.5 text-ink-soft">{intensidadLabel}</span>
-          <span className="glass rounded-full px-3 py-1.5 text-ink-soft">{afinidad}% de afinidad</span>
+          <span className="glass rounded-full px-3 py-1.5 text-ink-soft">{afinidad}% para ti</span>
         </div>
 
-        <p className="mt-6 max-w-md text-pretty text-base italic leading-relaxed text-ink-soft">
+        <p className="mt-6 max-w-md text-pretty text-base leading-relaxed text-ink-soft">
           {baseDescripcion}
         </p>
 
-        {/* Pirámide de notas */}
-        <div className="mt-8 grid w-full max-w-lg gap-3 text-left">
-          <NotaFila titulo="Cabeza" notas={notas.cabeza} color={f.colorSoft} delay={0.7} />
-          <NotaFila titulo="Corazón" notas={notas.corazon} color={f.color} delay={0.85} />
-          <NotaFila titulo="Fondo" notas={notas.fondo} color={f.colorDeep} delay={1.0} />
+        {/* Resumen interactivo del aroma */}
+        <div className="mt-9 w-full">
+          <PiramideNotas familia={familia} notas={notas} intensidad={intensidad} estela={estela} />
         </div>
 
-        <p className="mt-5 text-xs text-ink-muted">
-          Sobre la base <span className="text-ink-soft">{baseNombre}</span>
+        <p className="mt-6 text-xs text-ink-muted">
+          La construimos sobre <span className="text-ink-soft">{baseNombre}</span>
         </p>
 
         {/* CTA */}
         <motion.button
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.1, duration: 0.8, ease: EASE }}
+          transition={{ delay: 0.9, duration: 0.8, ease: EASE }}
           onClick={comprar}
-          className="mt-9 rounded-full bg-brass px-9 py-4 text-base font-medium text-canvas shadow-lg shadow-brass/25 transition-all duration-300 hover:bg-brass-soft hover:shadow-brass/40"
+          className="mt-8 rounded-full bg-brass px-9 py-4 text-base font-medium text-canvas shadow-lg shadow-brass/25 transition-all duration-300 hover:bg-brass-soft hover:shadow-brass/40"
         >
-          Hazla realidad — desde {formatCLP(desde)}
+          Quiero esta fragancia · desde {formatCLP(desde)}
         </motion.button>
 
         {/* Alternativas */}
         {alternativas.length > 0 && (
           <div className="mt-10 w-full max-w-md">
-            <p className="text-xs uppercase tracking-[0.25em] text-ink-muted">O quizás…</p>
+            <p className="text-xs uppercase tracking-[0.25em] text-ink-muted">
+              Si quieres seguir explorando
+            </p>
             <div className="mt-3 flex flex-wrap justify-center gap-2">
               {alternativas.map((a) => (
-                <span
-                  key={a.nombre}
-                  className="glass rounded-full px-3 py-1.5 text-xs text-ink-soft"
-                >
+                <span key={a.nombre} className="glass rounded-full px-3 py-1.5 text-xs text-ink-soft">
                   {a.nombre} · {a.score}%
                 </span>
               ))}
@@ -224,37 +235,9 @@ export function Revelacion({
           href="/ritual"
           className="mt-10 text-xs text-ink-muted underline-offset-4 transition-colors hover:text-ink hover:underline"
         >
-          Rehacer el ritual
+          Volver a empezar el ritual
         </Link>
       </motion.div>
     </Aura>
-  );
-}
-
-function NotaFila({
-  titulo,
-  notas,
-  color,
-  delay,
-}: {
-  titulo: string;
-  notas: string[];
-  color: string;
-  delay: number;
-}) {
-  if (!notas.length) return null;
-  return (
-    <motion.div
-      initial={{ opacity: 0, x: -12 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ delay, duration: 0.7, ease: EASE }}
-      className="glass flex items-center gap-3 rounded-xl px-4 py-3"
-    >
-      <span className="h-2 w-2 flex-shrink-0 rounded-full" style={{ background: color }} />
-      <span className="w-16 flex-shrink-0 text-xs uppercase tracking-wider text-ink-muted">
-        {titulo}
-      </span>
-      <span className="text-sm text-ink-soft">{notas.join(' · ')}</span>
-    </motion.div>
   );
 }

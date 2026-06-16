@@ -191,8 +191,8 @@ function Mezclando() {
         transition={{ rotate: { duration: 3, repeat: Infinity, ease: 'linear' }, scale: { duration: 2, repeat: Infinity } }}
         style={{ boxShadow: '0 0 50px -10px #c9a44c' }}
       />
-      <p className="font-serif text-2xl text-ink">Destilando tu fragancia…</p>
-      <p className="text-sm text-ink-muted">Traduciendo quién eres en notas.</p>
+      <p className="font-serif text-2xl text-ink">Mezclando tu fragancia…</p>
+      <p className="text-sm text-ink-muted">Traduciendo tus respuestas en aroma.</p>
     </motion.div>
   );
 }

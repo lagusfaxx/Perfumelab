@@ -20,19 +20,19 @@ function dominante(acc: PreferenceVector): FamiliaKey {
 }
 
 const NOMBRE_FAMILIA: Record<FamiliaKey, string> = {
-  CITRICOS: 'lo luminoso y chispeante',
-  FLORALES: 'lo delicado y floral',
-  AMADERADOS: 'lo cálido y amaderado',
-  ORIENTALES: 'lo íntimo y envolvente',
-  ACUATICOS: 'lo fresco y abierto',
-  VERDES: 'lo verde y terroso',
+  CITRICOS: 'luz y chispa',
+  FLORALES: 'algo floral y suave',
+  AMADERADOS: 'madera y calma',
+  ORIENTALES: 'algo íntimo y envolvente',
+  ACUATICOS: 'frescor y aire',
+  VERDES: 'verde y tierra',
 };
 
 export const RITUAL_STEPS: RitualStep[] = [
   {
     id: 'momento',
-    pregunta: '¿Qué momento del día te representa?',
-    subtitulo: 'No el que vives. El que eres.',
+    pregunta: '¿A qué hora del día te sientes más tú?',
+    subtitulo: 'No lo pienses. Elige la primera que aparezca.',
     options: [
       {
         id: 'amanecer',
@@ -63,12 +63,11 @@ export const RITUAL_STEPS: RitualStep[] = [
         weights: { ORIENTALES: 0.9, AMADERADOS: 0.4, calidez: 0.8, intensidad: 0.7, dulzor: 0.5 },
       },
     ],
-    reflejo: (acc) =>
-      `Tu perfil empieza a inclinarse hacia ${NOMBRE_FAMILIA[dominante(acc)]}…`,
+    reflejo: (acc) => `Algo en ti pide ${NOMBRE_FAMILIA[dominante(acc)]}…`,
   },
   {
     id: 'textura',
-    pregunta: 'Elige una textura para tocar con los ojos cerrados.',
+    pregunta: 'Cierra los ojos. ¿Qué te provoca tocar?',
     options: [
       {
         id: 'seda',
@@ -104,8 +103,8 @@ export const RITUAL_STEPS: RitualStep[] = [
   },
   {
     id: 'lugar',
-    pregunta: 'Un lugar al que tu memoria vuelve sola.',
-    subtitulo: 'Respíralo de nuevo.',
+    pregunta: 'Un lugar al que vuelves sin querer.',
+    subtitulo: 'Respíralo otra vez.',
     options: [
       {
         id: 'bosque',
@@ -140,13 +139,13 @@ export const RITUAL_STEPS: RitualStep[] = [
     ],
     reflejo: (acc) =>
       acc.calidez > 0.5
-        ? 'Hay calor en lo que eliges. Algo envolvente te llama.'
-        : 'Buscas claridad, aire, algo que respire contigo.',
+        ? 'Hay calor en lo que eliges. Buscas algo que abrace.'
+        : 'Buscas aire y claridad. Algo que respire contigo.',
   },
   {
     id: 'intensidad',
-    pregunta: '¿Cómo quieres que te recuerden?',
-    subtitulo: 'La huella que dejas al salir de una habitación.',
+    pregunta: 'Cuando sales de un lugar, ¿qué dejas?',
+    subtitulo: 'La huella que queda en el aire.',
     options: [
       {
         id: 'susurro',
@@ -196,7 +195,7 @@ export const RITUAL_STEPS: RitualStep[] = [
   },
   {
     id: 'amor',
-    pregunta: 'Una nota que amas sin razón.',
+    pregunta: 'Una nota que amas sin saber por qué.',
     options: [
       {
         id: 'citrico',
@@ -238,8 +237,8 @@ export const RITUAL_STEPS: RitualStep[] = [
   },
   {
     id: 'rechazo',
-    pregunta: '¿Y algo que nunca llevarías?',
-    subtitulo: 'Saber lo que no eres también te define.',
+    pregunta: '¿Y algo que no va contigo?',
+    subtitulo: 'Saber qué no eres también ayuda.',
     options: [
       {
         id: 'no-dulce',
@@ -268,7 +267,7 @@ export const RITUAL_STEPS: RitualStep[] = [
         weights: {},
       },
     ],
-    reflejo: () => 'Ya casi puedo nombrar tu fragancia. Respira hondo.',
+    reflejo: () => 'Ya casi puedo nombrarlo. Respira hondo.',
   },
 ];
 

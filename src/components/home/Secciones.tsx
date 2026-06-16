@@ -1,37 +1,51 @@
 import Link from 'next/link';
 import { FAMILIA_LIST } from '@/lib/families';
+import { DemoFragancia } from './DemoFragancia';
 
 const PASOS = [
   {
     n: '01',
-    titulo: 'El Ritual',
+    titulo: 'Te preguntamos',
     texto:
-      'Siete preguntas, una por pantalla. No un formulario: un viaje. Cada respuesta enciende color, sonido y movimiento, y te devuelve un fragmento de quién eres.',
+      'Siete preguntas, una a una. Eliges entre recuerdos, texturas y lugares — y la pantalla cambia de color y de sonido contigo. No hay respuestas correctas; están las tuyas.',
   },
   {
     n: '02',
-    titulo: 'La Revelación',
+    titulo: 'Te lo revelamos',
     texto:
-      'Tus respuestas se traducen en notas. Aparece tu fragancia con un nombre evocador —que puedes hacer tuyo— y su pirámide olfativa de cabeza, corazón y fondo.',
+      'Tus elecciones se vuelven notas. Aparece tu fragancia con un nombre que puedes cambiar, y la exploras nota por nota hasta sentirla en la piel.',
   },
   {
     n: '03',
-    titulo: 'Tu Objeto',
+    titulo: 'Te lo enviamos',
     texto:
-      'La preparamos a mano y la enviamos: un frasco único con tu nombre y tu historia. El perfume es el final; la experiencia empieza mucho antes.',
+      'La preparamos a mano y te la mandamos: un frasco con tu nombre y tu historia. El aroma es el final feliz; lo bonito empieza mucho antes.',
   },
 ];
 
 export function Secciones() {
   return (
     <>
-      {/* Cómo funciona */}
-      <section id="como-funciona" className="mx-auto max-w-6xl px-5 py-24 sm:px-8">
-        <p className="text-center text-xs uppercase tracking-[0.35em] text-brass">
-          Cómo funciona
-        </p>
+      {/* Demo interactiva */}
+      <section id="demo" className="mx-auto max-w-5xl px-5 py-24 sm:px-8">
+        <p className="text-center text-xs uppercase tracking-[0.35em] text-brass">Pruébalo aquí</p>
         <h2 className="mx-auto mt-4 max-w-2xl text-balance text-center font-serif text-3xl text-ink sm:text-4xl">
-          Tres pasos para destilar tu identidad
+          Así se ve —y se siente— un aroma
+        </h2>
+        <p className="mx-auto mt-4 max-w-xl text-center text-ink-soft">
+          El olfato no cabe en una pantalla, pero el color, el ritmo y el sonido sí.
+          Toca las notas, cambia de fragancia. Cuando quieras, diseña la tuya.
+        </p>
+        <div className="mt-10">
+          <DemoFragancia />
+        </div>
+      </section>
+
+      {/* Cómo funciona */}
+      <section id="como-funciona" className="mx-auto max-w-6xl px-5 py-16 sm:px-8">
+        <p className="text-center text-xs uppercase tracking-[0.35em] text-brass">Cómo funciona</p>
+        <h2 className="mx-auto mt-4 max-w-2xl text-balance text-center font-serif text-3xl text-ink sm:text-4xl">
+          De quién eres a un frasco con tu nombre
         </h2>
         <div className="mt-14 grid gap-6 md:grid-cols-3">
           {PASOS.map((p) => (
@@ -46,11 +60,9 @@ export function Secciones() {
 
       {/* Familias olfativas */}
       <section className="mx-auto max-w-6xl px-5 py-12 sm:px-8">
-        <p className="text-center text-xs uppercase tracking-[0.35em] text-brass">
-          Seis mundos
-        </p>
+        <p className="text-center text-xs uppercase tracking-[0.35em] text-brass">Seis familias</p>
         <h2 className="mx-auto mt-4 max-w-2xl text-balance text-center font-serif text-3xl text-ink sm:text-4xl">
-          Cada familia, un lenguaje propio
+          Cada aroma habla distinto
         </h2>
         <div className="mt-12 grid grid-cols-2 gap-4 md:grid-cols-3">
           {FAMILIA_LIST.map((f) => (
@@ -62,10 +74,7 @@ export function Secciones() {
                 className="absolute -right-8 -top-8 h-24 w-24 rounded-full blur-2xl transition-opacity duration-500 group-hover:opacity-90"
                 style={{ background: f.color, opacity: 0.55 }}
               />
-              <span
-                className="relative inline-block h-3 w-3 rounded-full"
-                style={{ background: f.color }}
-              />
+              <span className="relative inline-block h-3 w-3 rounded-full" style={{ background: f.color }} />
               <h3 className="relative mt-4 font-serif text-xl text-ink">{f.nombre}</h3>
               <p className="relative mt-2 text-sm leading-relaxed text-ink-muted">{f.mood}</p>
             </div>
@@ -76,17 +85,17 @@ export function Secciones() {
       {/* Cierre */}
       <section className="mx-auto max-w-3xl px-5 py-28 text-center sm:px-8">
         <h2 className="text-balance font-serif text-4xl leading-tight text-ink sm:text-5xl">
-          ¿Quién eres,
-          <span className="text-brass-gradient"> en una fragancia?</span>
+          ¿Y tú,
+          <span className="text-brass-gradient"> a qué hueles?</span>
         </h2>
         <p className="mx-auto mt-5 max-w-md text-ink-soft">
-          Descúbrelo en menos de tres minutos. Sin compromiso, sólo asombro.
+          Lo descubres en menos de tres minutos. Sin compromiso, solo curiosidad.
         </p>
         <Link
           href="/ritual"
           className="mt-9 inline-block rounded-full bg-brass px-10 py-4 text-base font-medium text-canvas shadow-lg shadow-brass/25 transition-all duration-300 hover:bg-brass-soft hover:shadow-brass/40"
         >
-          Comenzar el ritual
+          Descubrir mi aroma
         </Link>
       </section>
 

@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
+import { fraunces, inter } from './fonts';
 import { SoundProvider } from '@/components/sensory/SoundProvider';
 
 const APP_URL = process.env.APP_URL ?? 'https://perfumelabchile.cl';
@@ -51,16 +52,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="es">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        {/* Fuentes de display cargadas de forma no bloqueante; degradan a Georgia/system-ui */}
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@300;400;500;600&display=swap"
-        />
-      </head>
+    <html lang="es" className={`${fraunces.variable} ${inter.variable}`}>
       <body>
         <SoundProvider>{children}</SoundProvider>
       </body>
