@@ -1,0 +1,238 @@
+// Perfume Lab Chile — esquema de datos
+// PostgreSQL + Prisma. Dinero en pesos chilenos (CLP) → enteros, sin decimales.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────────────────────────
+// Enums
+// ─────────────────────────────────────────────────────────────
+
+enum FamiliaOlfativa {
+  CITRICOS
+  FLORALES
+  AMADERADOS
+  ORIENTALES
+  ACUATICOS
+  VERDES
+}
+
+enum Intensidad {
+  EDT // Eau de Toilette
+  EDP // Eau de Parfum
+  PARFUM // Extrait / Parfum
+}
+
+enum EstadoPedido {
+  PENDIENTE // creado, esperando pago
+  PAGADO // FLOW confirmó el pago
+  RECHAZADO // FLOW rechazó / anuló el pago
+  EN_PREPARACION // en maceración / blendeo
+  ENVIADO // despachado
+  ENTREGADO // recibido por el cliente
+  CANCELADO // anulado manualmente
+}
+
+// ─────────────────────────────────────────────────────────────
+// Catálogo / motor de mapeo
+// ─────────────────────────────────────────────────────────────
+
+/// Fórmula madre. 8–12 bases pre-formuladas.
+model Base {
+  id              String          @id @default(cuid())
+  nombre          String
+  familiaOlfativa FamiliaOlfativa
+  descripcion     String?
+  notasCabeza     String[] // top notes
+  notasCorazon    String[] // heart notes
+  notasFondo      String[] // base notes
+  /// Vector de perfil para scoring: { calido, fresco, dulce, intenso, ... } 0..1
+  perfilJson      Json
+  activo          Boolean         @default(true)
+  combinaciones   Combinacion[]
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+}
+
+/// Nota añadible en % controlado. Set acotado.
+model Modificador {
+  id            String        @id @default(cuid())
+  nombre        String
+  nota          String
+  descripcion   String?
+  /// Aporte al vector de perfil (se suma ponderado por el %).
+  efectoJson    Json
+  /// % por defecto sobre la base (0..100). El blend real lo fija la combinación.
+  porcentaje    Int           @default(5)
+  activo        Boolean       @default(true)
+  combinaciones Combinacion[]
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+/// Combinación válida (pre-aprobada): base + modificador? + intensidad = SKU.
+/// NO se generan fórmulas libres: el cuestionario sólo puede resolver a una de éstas.
+model Combinacion {
+  id            String           @id @default(cuid())
+  sku           String           @unique
+  base          Base             @relation(fields: [baseId], references: [id])
+  baseId        String
+  modificador   Modificador?     @relation(fields: [modificadorId], references: [id])
+  modificadorId String?
+  /// % del modificador en esta combinación específica (0..100).
+  modPorcentaje Int              @default(0)
+  intensidad    Intensidad
+  /// Precio de referencia CLP. El precio final lo fija cada Producto/Formato.
+  precioBase    Int
+  /// Ficha técnica + instrucciones de producción (blend, maceración, etc.)
+  fichaJson     Json
+  /// Vector combinado pre-calculado (base + efecto del modificador) para scoring.
+  vectorJson    Json
+  activo        Boolean          @default(true)
+  productos     Producto[]
+  perfiles      PerfilOlfativo[]
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  @@index([activo])
+}
+
+/// Formato vendible de una combinación (ml + precio).
+model Producto {
+  id            String      @id @default(cuid())
+  combinacion   Combinacion @relation(fields: [combinacionId], references: [id])
+  combinacionId String
+  nombre        String // ej. "Eau de Parfum · 50 ml"
+  ml            Int
+  /// Espejo de combinacion.intensidad para listados/SKU; se setea en el seed.
+  tipo          Intensidad
+  precio        Int // CLP
+  activo        Boolean     @default(true)
+  pedidos       Pedido[]
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@index([combinacionId])
+}
+
+/// Add-on de packaging (caja premium, tarjeta, grabado…).
+model PackagingOpcion {
+  id          String   @id @default(cuid())
+  nombre      String
+  descripcion String?
+  precioExtra Int      @default(0) // CLP
+  activo      Boolean  @default(true)
+  pedidos     Pedido[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// ─────────────────────────────────────────────────────────────
+// Resultado del cuestionario-ritual
+// ─────────────────────────────────────────────────────────────
+
+/// Perfil olfativo generado por el cuestionario. Resuelve a una combinación.
+model PerfilOlfativo {
+  id              String      @id @default(cuid())
+  /// Respuestas crudas del ritual { stepId: optionId }.
+  respuestasJson  Json
+  /// Vector de preferencias normalizado calculado a partir de las respuestas.
+  vectorJson      Json
+  /// Mejor match.
+  combinacion     Combinacion @relation(fields: [combinacionId], references: [id])
+  combinacionId   String
+  /// 1–2 alternativas: [{ combinacionId, sku, score, nombre }]
+  alternativasJson Json?
+  /// Nombre evocador autogenerado (ej. "Bruma de Medianoche").
+  nombreFragancia String
+  /// Email opcional capturado en la revelación (para remarketing).
+  email           String?
+  pedidos         Pedido[]
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  @@index([combinacionId])
+}
+
+// ─────────────────────────────────────────────────────────────
+// Pedidos / checkout
+// ─────────────────────────────────────────────────────────────
+
+model Pedido {
+  id      String @id @default(cuid())
+  /// Número humano de pedido (ej. PL-2026-000123). Usado como commerceOrder en FLOW.
+  numero  String @unique
+
+  // Fragancia diseñada
+  perfil                PerfilOlfativo @relation(fields: [perfilId], references: [id])
+  perfilId              String
+  /// Nombre que el cliente le puso a SU fragancia (snapshot).
+  nombreFraganciaCliente String
+
+  // Formato elegido (snapshot + relación)
+  producto     Producto @relation(fields: [productoId], references: [id])
+  productoId   String
+  formatoLabel String // snapshot, ej. "Eau de Parfum · 50 ml"
+
+  // Add-ons de packaging
+  packaging PackagingOpcion[]
+
+  // Datos del cliente
+  clienteNombre   String
+  clienteRut      String
+  clienteEmail    String
+  clienteTelefono String
+
+  // Dirección de envío
+  dirRegion      String
+  dirComuna      String
+  dirCalle       String
+  dirNumero      String
+  dirDepto       String?
+  dirReferencias String?
+
+  // Montos (CLP)
+  montoProducto  Int
+  montoPackaging Int @default(0)
+  montoEnvio     Int @default(0)
+  montoTotal     Int
+
+  // Estado + FLOW
+  estado         EstadoPedido @default(PENDIENTE)
+  flowToken      String?      @unique
+  flowOrder      String? // flowOrder devuelto por FLOW
+  flowStatus     Int? // 1 pendiente, 2 pagado, 3 rechazado, 4 anulado
+  flowPaymentJson Json? // payload completo de getStatus (auditoría)
+
+  // Notas internas de producción/envío
+  notaProduccion String?
+  trackingEnvio  String?
+
+  emailEnviado Boolean @default(false)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  paidAt    DateTime?
+
+  @@index([estado])
+  @@index([createdAt])
+}
+
+// ─────────────────────────────────────────────────────────────
+// Admin
+// ─────────────────────────────────────────────────────────────
+
+model AdminUser {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  nombre       String?
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
